@@ -8,7 +8,7 @@ app.use(express.json());
 const customers = [];
 
 //Middleware
-function verifyIfCostumersAlreadyExists(req, res, next) {
+function verifyIfCustomersAlreadyExists(req, res, next) {
   const { cpf, name } = req.body;
 
   const costumersAlreadyExists = customers.some(
@@ -51,7 +51,7 @@ function getBalance(statement) {
   return balance;
 }
 
-app.post("/account", verifyIfCostumersAlreadyExists, (req, res) => {
+app.post("/account", verifyIfCustomersAlreadyExists, (req, res) => {
   const { cpf, name } = req;
 
   customers.push({
@@ -126,7 +126,7 @@ app.get("/statement/date", verifyIfExistsAccountCPF, (req, res) => {
 
 app.put(
   "/account",
-  verifyIfCostumersAlreadyExists,
+  verifyIfCustomersAlreadyExists,
   verifyIfExistsAccountCPF,
   (req, res) => {
     const { name } = req;
@@ -150,6 +150,11 @@ app.delete("/account", verifyIfExistsAccountCPF, (req, res) => {
 
   //splice
   const customerIndex = customers.indexOf(customer);
+
+  if (customerIndex < 0) {
+    return res.status(404).json("Not found");
+  }
+
   customers.splice(customerIndex, 1);
   return res.status(200).json(customers);
 });
